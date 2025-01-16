@@ -21,7 +21,7 @@ public class Main {
     t2.start();
 
     try {
-      t1.join(); // main thread is waiting
+      t1.join(); // main thread is waiting but these can still be concurrent, one is just going to wait for the other to finish
       t2.join(); // main thread is waiting
     } catch (InterruptedException e) {
       e.printStackTrace();
