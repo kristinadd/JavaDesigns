@@ -3,6 +3,8 @@ public class Main {
   public static void main(String[] args) {
     BankAccount account = new BankAccount(100);
 
+    // use  Java Transaction Managment 
+
     Thread t1 = new Thread(() -> {
       for (int i = 0; i < 7; i++) {
         account.deposit(10);
