@@ -1,11 +1,9 @@
 package MiniBankDesign;
 
 public class Service {
-  private double balance;
   private BankAccount account;
 
   public Service(BankAccount account) {
-    this.balance = account.getBalance();
     this.account = account;
    };
 
@@ -18,6 +16,6 @@ public class Service {
    }
 
   public double getBalance() {
-   return balance;
+   return account.getBalance();
   }
 }

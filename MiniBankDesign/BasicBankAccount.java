@@ -29,7 +29,7 @@ public class BasicBankAccount implements BankAccount {
     } else {
       System.out.printf("You don't have enough balance to withdraw the amounf of: %.2f%n", amount);
       System.out.printf("Your current balance is: %.2f%n", balance);
-      return balance; 
+      return balance;
     }
   }
 
