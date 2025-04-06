@@ -15,8 +15,6 @@ class Main {
   // then that method can be called on the subclass instance,
   // no matter what the reference type is (superclass or subclass).
 
-
-
   BankAccount saveAccountSuper = new SavingsAccount();
   // The method fun() is undefined for the type BankAccountJava(67108964)
   // saveAccountSuper.fun();
@@ -27,15 +25,14 @@ class Main {
 
   // When calling a method in Java, the compiler checks the reference type and looks up the method in that class and all of its superclasses (up the inheritance chain).
   // If the method exists anywhere in that chain, it's callable.
-  
 
-  BankAccount myAccount = new SavingsAccount();
 
-  // System.out.println(myAccount.getBalance());
 
-  SavingsAccount myAccount2 = new SavingsAccount();
-  System.out.println(myAccount2.getBalance());
-  System.out.println(myAccount2.getAccountNumber());
+ System.out.println("======================================================");
+
+
+ SavingsAccount myAccount = new SavingsAccount();
+  System.out.println(myAccount.getBalance());
 
  }
 }
