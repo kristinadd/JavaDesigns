@@ -24,3 +24,5 @@ public class BankAccount {
     return balance;
   }
 }
+// you might define BankAccount as an abstract base class or interface.
+
