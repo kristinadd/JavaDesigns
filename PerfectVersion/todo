@@ -1,0 +1,197 @@
+// -----------------------------
+// 📦 Domain Layer (Interfaces & Models)
+// -----------------------------
+
+package domain;
+
+import java.math.BigDecimal;
+import java.util.Currency;
+import java.util.UUID;
+
+public interface BankAccount {
+    UUID getId();
+    int getAccountNumber();
+    Currency getCurrency();
+    BigDecimal getBalance();
+    void deposit(BigDecimal amount);
+    void withdraw(BigDecimal amount);
+}
+
+
+// ------------------------------------
+// 📦 Implementation Layer (Accounts)
+// ------------------------------------
+
+package domain;
+
+import java.math.BigDecimal;
+import java.util.Currency;
+import java.util.UUID;
+
+public class PersonalAccount implements BankAccount {
+    private final UUID id;
+    private final int accountNumber;
+    private final Currency currency;
+    private BigDecimal balance;
+
+    public PersonalAccount(int accountNumber, Currency currency) {
+        this.id = UUID.randomUUID();
+        this.accountNumber = accountNumber;
+        this.currency = currency;
+        this.balance = BigDecimal.ZERO;
+    }
+
+    public UUID getId() { return id; }
+    public int getAccountNumber() { return accountNumber; }
+    public Currency getCurrency() { return currency; }
+    public BigDecimal getBalance() { return balance; }
+
+    public void deposit(BigDecimal amount) {
+        balance = balance.add(amount);
+    }
+
+    public void withdraw(BigDecimal amount) {
+        if (balance.compareTo(amount) < 0)
+            throw new IllegalArgumentException("Insufficient funds");
+        balance = balance.subtract(amount);
+    }
+}
+
+
+package domain;
+
+import java.math.BigDecimal;
+import java.util.Currency;
+import java.util.UUID;
+
+public class SavingsAccount implements BankAccount {
+    private final UUID id;
+    private final int accountNumber;
+    private final Currency currency;
+    private BigDecimal balance;
+
+    public SavingsAccount(int accountNumber, Currency currency) {
+        this.id = UUID.randomUUID();
+        this.accountNumber = accountNumber;
+        this.currency = currency;
+        this.balance = BigDecimal.ZERO;
+    }
+
+    public UUID getId() { return id; }
+    public int getAccountNumber() { return accountNumber; }
+    public Currency getCurrency() { return currency; }
+    public BigDecimal getBalance() { return balance; }
+
+    public void deposit(BigDecimal amount) {
+        balance = balance.add(amount);
+    }
+
+    public void withdraw(BigDecimal amount) {
+        if (balance.compareTo(amount) < 0)
+            throw new IllegalArgumentException("Insufficient funds");
+        balance = balance.subtract(amount);
+    }
+}
+
+
+// -----------------------------
+// 🏭 Factory Layer
+// -----------------------------
+
+package factory;
+
+import domain.*;
+import java.util.Currency;
+
+public class AccountFactory {
+    public enum AccountType { PERSONAL, SAVINGS }
+
+    public static BankAccount create(AccountType type, int accountNumber, Currency currency) {
+        return switch (type) {
+            case PERSONAL -> new PersonalAccount(accountNumber, currency);
+            case SAVINGS -> new SavingsAccount(accountNumber, currency);
+        };
+    }
+}
+
+
+// -----------------------------
+// 📦 Service Layer
+// -----------------------------
+
+package service;
+
+import domain.BankAccount;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class AccountService {
+    private final Map<UUID, BankAccount> store = new ConcurrentHashMap<>();
+
+    public void create(BankAccount account) {
+        store.put(account.getId(), account);
+    }
+
+    public BankAccount read(UUID id) {
+        return store.get(id);
+    }
+
+    public void update(BankAccount account) {
+        store.put(account.getId(), account);
+    }
+
+    public void delete(UUID id) {
+        store.remove(id);
+    }
+
+    public Map<UUID, BankAccount> readAll() {
+        return store;
+    }
+}
+
+
+// -----------------------------
+// 🎮 UI/CLI/Controller Layer
+// -----------------------------
+
+package ui;
+
+import domain.BankAccount;
+import factory.AccountFactory;
+import factory.AccountFactory.AccountType;
+import service.AccountService;
+
+import java.math.BigDecimal;
+import java.util.Currency;
+import java.util.Scanner;
+import java.util.UUID;
+
+public class MainController {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        AccountService service = new AccountService();
+
+        System.out.println("Select Account Type (0 = Personal, 1 = Savings): ");
+        int type = scanner.nextInt();
+        System.out.println("Enter account number:");
+        int accNumber = scanner.nextInt();
+        scanner.nextLine();
+
+        BankAccount account = AccountFactory.create(
+            type == 0 ? AccountType.PERSONAL : AccountType.SAVINGS,
+            accNumber,
+            Currency.getInstance("USD")
+        );
+
+        service.create(account);
+        System.out.println("Account Created: " + account.getId());
+
+        System.out.println("Enter amount to deposit:");
+        BigDecimal depositAmount = scanner.nextBigDecimal();
+        account.deposit(depositAmount);
+        service.update(account);
+
+        System.out.println("Balance: " + account.getBalance());
+    }
+}
